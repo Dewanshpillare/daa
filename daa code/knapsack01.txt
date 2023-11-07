@@ -1,0 +1,75 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+const int MAX_N = 100;  // Maximum number of items
+const int MAX_W = 100;  // Maximum knapsack capacity
+
+int weights[MAX_N]; // creating array of weights
+int values[MAX_N]; // creating array for values
+int dp[MAX_N][MAX_W]; // creating 2D array for the table
+
+int knapsack01(int n, int capacity) {
+    for (int i = 0; i <= n; i++) { // traversing row
+        for (int w = 0; w <= capacity; w++) { // traversing column
+            if (i == 0 || w == 0) { // condition 1
+                dp[i][w] = 0;
+            } else if (weights[i - 1] <= w) { // condition 2
+                dp[i][w] = max(dp[i - 1][w], values[i - 1] + dp[i - 1][w - weights[i - 1]]);
+            } else { // condition 3
+                dp[i][w] = dp[i - 1][w];
+            }
+        }
+    }
+    return dp[n][capacity];
+}
+
+void printTable(int n, int capacity) {
+    cout << "Dynamic Programming Table:" << endl;
+    for (int i = 0; i <= n; i++) {
+        for (int w = 0; w <= capacity; w++) {
+            cout << dp[i][w] << "\t";
+        }
+        cout << endl;
+    }
+}
+
+void printSelectedItems(int n, int capacity) {
+    cout << "Selected Items:" << endl;
+    vector<int> selectedItems; //Vector named selected item is created.This vector will store the indices of the items selected in the knapsack.
+    int i = n, w = capacity;
+    while (i > 0 && w > 0) {
+        if (dp[i][w] != dp[i - 1][w]) {
+            selectedItems.push_back(i - 1);
+            w -= weights[i - 1];
+        }
+        i--;
+    }
+
+    for (int item : selectedItems) {
+        cout << "Item " << item + 1 << ": Weight = " << weights[item] << ", Value = " << values[item] << endl;
+    }
+}
+
+int main() {
+    int n, capacity;
+    cout << "Enter the number of items: ";
+    cin >> n;
+    cout << "Enter the knapsack capacity: ";
+    cin >> capacity;
+
+    cout << "Enter weight and value for each item:" << endl;
+    for (int i = 0; i < n; i++) {
+        cin >> weights[i] >> values[i];
+    }
+
+    int maxProfit = knapsack01(n, capacity);
+    cout << "Maximum Profit: " << maxProfit << endl;
+
+    printTable(n, capacity);
+    printSelectedItems(n, capacity);
+
+    return 0;
+}

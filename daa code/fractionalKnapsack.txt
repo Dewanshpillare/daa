@@ -1,0 +1,66 @@
+#include <iostream>
+
+using namespace std;
+
+struct Item {
+    double weight;
+    double value;
+    double fraction;
+};
+
+void bubbleSort(Item* items, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if ((items[j].value / items[j].weight) < (items[j + 1].value / items[j + 1].weight)) {
+                swap(items[j], items[j + 1]);
+            }
+        }
+    }
+}
+
+void fractionalKnapsack(Item* items, int n, double capacity) {
+    bubbleSort(items, n);
+
+    double maxProfit = 0.0;
+
+    for (int i = 0; i < n; i++) {
+        if (capacity >= items[i].weight) {
+            items[i].fraction = 1.0;
+            maxProfit += items[i].value;
+            capacity -= items[i].weight;
+        } else {
+            items[i].fraction = capacity / items[i].weight;
+            maxProfit += items[i].value * items[i].fraction;
+            break;
+        }
+    }
+
+    cout << "Maximum Profit: " << maxProfit << endl;
+
+    cout << "Fraction of items taken:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << "Item " << i + 1 << ": Weight=" << items[i].weight << ", Value=" << items[i].value << ", Fraction=" << items[i].fraction << endl;
+    }
+}
+
+int main() {
+    int n;
+    double capacity;
+    cout << "Enter the number of items: ";
+    cin >> n;
+    cout << "Enter the knapsack capacity: ";
+    cin >> capacity;
+
+    Item* items = new Item[n];
+
+    cout << "Enter weight and value for each item:" << endl;
+    for (int i = 0; i < n; i++) {
+        cin >> items[i].weight >> items[i].value;
+    }
+
+    fractionalKnapsack(items, n, capacity);
+
+    delete[] items;
+
+    return 0;
+}
